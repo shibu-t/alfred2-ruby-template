@@ -54,12 +54,20 @@ class Search
 
     def getStationCode(station_name)
         sta_obj = Station.new(station_name)
-        first_station = sta_obj.getResponse["ResultSet"]["Point"][0]
+        stations = sta_obj.getResponse["ResultSet"]["Point"]
+
+        # 候補が1つのときは配列ではなくhashで返ってくるため
+        if (stations.is_a?(Hash))
+            first_station = stations
+        else
+            first_station = stations[0]
+        end
+
         if (first_station.nil?)
             return ''
         end
-        station_code = first_station["Station"]["code"]
-        return station_code
+
+        return first_station["Station"]["code"]
     end
 
     def main
@@ -71,6 +79,7 @@ class Search
 
         url = getUrl(from_station_code, to_station_code)
         uri = getUri(url)
+
         body = Net::HTTP.get_response(uri).body;
         json = JSON.parse(body);
         resource_uri = json["ResultSet"]["ResourceURI"]

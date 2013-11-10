@@ -4,6 +4,8 @@
 require 'rubygems' unless defined? Gem # rubygems is only needed in 1.8
 require "bundle/bundler/setup"
 require "alfred"
+require "lib/Search"
+require "lib/Endpoint"
 
 
 
@@ -14,14 +16,23 @@ Alfred.with_friendly_error do |alfred|
   # add a file feedback
   fb.add_file_item(File.expand_path "~/Applications/")
 
-  # add an arbitrary feedback
-  fb.add_item({
-    :uid      => ""                     ,
-    :title    => "Just a Test"          ,
-    :subtitle => "feedback item"        ,
-    :arg      => "A test feedback Item" ,
-    :valid    => "yes"                  ,
-  })
+  if (!ARGV[0].nil?)
+      from = ARGV[0]
+      to = ARGV[1]
+
+      query = ARGV.join(" ").strip
+
+      sta = Search.new(from, to)
+      url = sta.main()
+      # add an arbitrary feedback
+      fb.add_item({
+        :uid      => ""                     ,
+        :title    => query          ,
+        :subtitle => "feedback item"        ,
+        :arg      =>  url,
+        :valid    => "yes"                  ,
+      })
+  end
   
   # add an feedback to test rescue feedback
   fb.add_item({
